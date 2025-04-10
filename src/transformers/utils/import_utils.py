@@ -1840,7 +1840,7 @@ class DummyObject(type):
     is_dummy = True
 
     def __getattribute__(cls, key):
-        if (key.startswith("_") and key != "_from_config") or key == "is_dummy":
+        if (key.startswith("_") and key != "_from_config") or key == "mro" or key == "call":
             return super().__getattribute__(key)
         requires_backends(cls, cls._backends)
 
@@ -1971,8 +1971,11 @@ class _LazyModule(ModuleType):
                 def __init__(self, *args, **kwargs):
                     requires_backends(self, missing_backends)
 
+                def call(self, *args, **kwargs):
+                    pass
+
             Placeholder.__name__ = name
-            Placeholder.__module__ = self.__spec__
+            Placeholder.__module__ = self._class_to_module[name]
 
             value = Placeholder
         elif name in self._class_to_module.keys():
